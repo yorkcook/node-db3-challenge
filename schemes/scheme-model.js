@@ -4,7 +4,8 @@ module.exports = {
   findSteps,
   add,
   update,
-  remove
+  remove,
+  addStep
 };
 
 const express = require("express");
@@ -26,21 +27,11 @@ function findById(id) {
 }
 
 function findSteps(id) {
-  return (
-    db("schemes as s")
-      .innerJoin("steps as st", "s.id", "st.scheme_id")
-      .select("s.scheme_name", "st.step_number", "st.instructions")
-
-      .where({ scheme_id: id })
-      // .orderBy([
-      //   "id",
-      //   { column: "s.scheme_name", order: "desc" },
-      //   { column: "st.step_number", order: "asc" }
-      // ]);
-
-      //   .orderBy("st.step_number", asc)
-      .orderBy("st.step_number")
-  );
+  return db("schemes as s")
+    .innerJoin("steps as st", "s.id", "st.scheme_id")
+    .select("s.scheme_name", "st.step_number", "st.instructions")
+    .orderBy("st.step_number")
+    .where({ scheme_id: id });
 }
 
 function add(scheme) {
@@ -57,4 +48,11 @@ function remove(id) {
   return db("schemes")
     .where({ id })
     .del();
+}
+
+function addStep(step, scheme_id) {
+  return db("schemes as s")
+    .innerJoin("steps as st", "s.id", "st.scheme_id")
+    .insert(step)
+    .where({ scheme_id });
 }
